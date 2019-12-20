@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: syslog-ng
+  labels:
+    app: syslog-ng
+spec:
+  replicas: 1
+    selector:
+      matchLabels:
+        app: syslog-ng
+  template:
+    metadata:
+      name: syslog-ng
+      labels:
+        app: syslog-ng      
+    spec:
+      containers:
+      - name: syslog-ng
+        image: balabit/syslog-ng:3.24.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 514
+          protocol: UCP
+        - containerPort: 601
+          protocol: TCP
+---    
+apiVersion: v1
+kind: Service
+metadata:
+  name: syslog-ng
+  labels:
+    app: syslog-ng
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: UDP
+    port: 514
+    targetPort: 514
+  - protocol: TCP
+    port: 514
+    targetPort: 601
+  selector:
+    app: syslog-ng        
